@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Elos</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{BASE_TAG}}
+
+    <link rel="stylesheet" href="assets/vendor.css">
+    <link rel="stylesheet" href="assets/elos.css">
+  </head>
+  <body>
+    <script>
+      window.ElosENV = {{ENV}};
+      window.EmberENV = window.ElosENV.EmberENV;
+    </script>
+    <script src="assets/vendor.js"></script>
+    <script src="assets/elos.js"></script>
+    <script>
+      window.Elos = require('elos/app')['default'].create(ElosENV.APP);
+    </script>
+  </body>
+</html>
