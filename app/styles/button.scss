@@ -1,0 +1,24 @@
+@import "variables";
+button {
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 1.2em;
+  padding: 5px;
+  cursor: pointer;
+}
+
+button[type='submit'] {
+  float: right;
+  color: $splash;
+}
+
+button[type='submit'].disabled {
+  color: $dark-gray;
+}
+
+button[type='auxiliary'] {
+  color: $light-gray;
+  float: left;
+  font-size: .75em;
+}

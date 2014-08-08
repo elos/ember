@@ -1,11 +1,29 @@
 @import "bourbon/bourbon";
 @import "neat/neat";
 
+@import "variables";
+
 div.sessions-container {
   @include outer-container;
+  margin-top: 10em;
 
-  div.input-group {
+  form {
     @include span-columns(6);
     @include shift(3);
+
+    div.title {
+      font-weight: 300;
+      font-size: 1.3em;
+      color: $dark-gray;
+      text-align: center;
+    }
+
+    div.input-group {
+      margin-top: 1em;
+    }
+
+    button[type="submit"] {
+      margin-top: 1em;
+    }
   }
 }
