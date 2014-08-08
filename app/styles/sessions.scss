@@ -1,0 +1,11 @@
+@import "bourbon/bourbon";
+@import "neat/neat";
+
+div.sessions-container {
+  @include outer-container;
+
+  div.input-group {
+    @include span-columns(6);
+    @include shift(3);
+  }
+}

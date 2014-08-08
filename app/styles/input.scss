@@ -1,0 +1,62 @@
+@import "variables";
+
+div.input-group {
+  :first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  :last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  input {
+    width:100%;
+    background-color: $input-background;
+    border: 1px solid $dark-gray;
+    margin: 0;
+    padding: 12px 10px;
+    font-size: .85em;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  // overlaps the border
+  input + input {
+    margin-top: -1px;
+  }
+
+  input.error {
+    background-color: rgba($error, 0.1);
+    border-color: $error;
+  }
+
+  input.error + input {
+    border-top-color: $error;
+  }
+}
+
+ul.select {
+  list-style-type: none;
+  padding: 0;
+  li {
+    color: $splash;
+    text-align: center;
+    height: 50px;
+    line-height: 50px;
+    font-size: 18px;
+    border-top: 1px solid $light-gray;
+    border-bottom: 1px solid $light-gray;
+  }
+  li + li {
+    border-top: none;
+  }
+}
+
+input[type=checkbox] {
+  visibility: hidden;
+  border: 2px solid $dark-gray;
+}
