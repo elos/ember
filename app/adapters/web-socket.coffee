@@ -19,7 +19,7 @@ ElosConnection = Ember.Object.extend
     return if @get "connected"
 
     protocol = "#{id}-#{key}"
-    @connection = new WebSocket @host, protocol
+    @connection = new WebSocket @get "host", protocol
     @configureConnection()
 
   # Closes the connection to the server
@@ -34,16 +34,15 @@ ElosConnection = Ember.Object.extend
     return !!@connection
   ).property "connection"
 
-
   # Internal configuration of the websocket connection
   configureConnection: ->
     @connection.onmessage = @OnMessage
     @connection.onerror = @onError
     @connection.onclose = @onClose
 
-
   # Handles generic onmessage (where everything happens)
   onMessage: (event)->
+    # This event.data is the envelope object, which also has a data attribute
     @adapter.process JSON.parse event.data
 
   # Handles errors (not sure what those might be yet)
