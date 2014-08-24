@@ -2,73 +2,72 @@
 `import DS from 'ember-data'`
 `import Ember from 'ember'`
 
-# --- ElosConnection {{{
-ElosConnection = Ember.Object.extend
-
-  # URL to connect to
+# --- WebSocketAdapter {{{
+WebSocketAdapter = DS.Adapter.extend
+  id: null
+  key: null
   host: "ws://localhost:8000/v1/authenticate"
 
-  # The ember adapter that queries this connection
-  adapter: null
+  protocol: (->
+    return null unless @get("id") and @get("key")
+    "#{@get("id")}-#{@get("key")}"
+  ).observes("id", "key")
 
-  # The websocket connection to the elos server
-  connection: null
+  setupConnection: (->
+    protocol = @protocol()
+    return unless protocol
 
-  # Opens a socket to the server
-  connect: (id, key)->
-    return if @get "connected"
-
-    protocol = "#{id}-#{key}"
     @connection = new WebSocket @get "host", protocol
-    @configureConnection()
-
-  # Closes the connection to the server
-  disconnect: ->
-    return unless @get "connected"
-
-    @connection.close()
-    @onClose manual: true
-
-  # Checks the presence of the connection
-  connected: (->
-    return !!@connection
-  ).property "connection"
-
-  # Internal configuration of the websocket connection
-  configureConnection: ->
-    @connection.onmessage = @OnMessage
+    @connection.onmessage = @onMessage
     @connection.onerror = @onError
     @connection.onclose = @onClose
+  ).observes("id", "key").on("init")
 
-  # Handles generic onmessage (where everything happens)
-  onMessage: (event)->
-    # This event.data is the envelope object, which also has a data attribute
-    @adapter.process JSON.parse event.data
+  onMessage: (event) ->
+    @process JSON.parse event.data
 
-  # Handles errors (not sure what those might be yet)
-  onError: (event)->
-    console.log "There was an error with your Elos connection"
+  onError: (event) ->
+    console.log "There was an error with the WebSocket connection"
     console.log event
 
-  # Handles close event (triggered twice on manual close for console info)
-  onClose: (event)->
+  onClose: (event) ->
     if event.manual
-      console.log "You manually closed the elos connection"
+      console.log "You manually closed the WebSocket connection"
     else
-      console.log "The Elos connection has been closed"
+      console.log "The WebSocket connection has been closed"
       console.log event
-
-  init: (id, key, adapter)->
-    @connect id, key
-    @adapter = adapter
-    return this
-# --- }}}
-
-# --- WebSocketAdapter {{{
-WebSocketAdapter = DS.ActiveModelAdapter.extend
 
   process: (envelope)->
     console.log envelope
+
+  message: (action, type, messageData={}) ->
+    data = {}
+    data[type.typeKey] = messageData
+
+    action: action
+    data: data
+
+  find: (store, type, id, record) ->
+    msg = @message "GET", type, { id: id }
+    @connection.send JSON.stringify msg
+
+  createRecord: (store, type, record) ->
+    data = {}
+    serializer = store.serializerFor(type.typeKey)
+
+    serializer.serializeIntoHash(data, type, record, { includeId: true })
+
+    msg = @message "POST", type, data
+    @connection.send JSON.stringify msg
+
+  updateRecord: (store, type, record) ->
+    @createRecord(store, type, record) # for now...
+
+  deleteRecord: (store, type, record) ->
+    id = Ember.get(record, "id")
+
+    msg = @message "DELETE", type, { id: id }
+    @connection.send JSON.stringify msg
 # --- }}}
 
 `export default WebSocketAdapter`
