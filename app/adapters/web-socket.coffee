@@ -6,6 +6,12 @@
 WebSocketAdapter = DS.Adapter.extend
   id: null
   key: null
+
+  store: null
+
+  connected: false
+  queue: []
+
   host: "ws://localhost:8000/v1/authenticate"
 
   protocol: (->
@@ -18,6 +24,7 @@ WebSocketAdapter = DS.Adapter.extend
     return unless protocol
 
     @connection = new WebSocket @get "host", protocol
+    @connection.onopen = @onOpen
     @connection.onmessage = @onMessage
     @connection.onerror = @onError
     @connection.onclose = @onClose
@@ -29,6 +36,10 @@ WebSocketAdapter = DS.Adapter.extend
   onError: (event) ->
     console.log "There was an error with the WebSocket connection"
     console.log event
+
+  onOpen: ->
+    @set 'connected', true
+    console.log "WebSocket connection opened"
 
   onClose: (event) ->
     if event.manual
@@ -47,9 +58,22 @@ WebSocketAdapter = DS.Adapter.extend
     action: action
     data: data
 
-  find: (store, type, id, record) ->
-    msg = @message "GET", type, { id: id }
-    @connection.send JSON.stringify msg
+  sendMessage: (action, type, messageData={}) ->
+    data = {}
+    data[type.typeKey] = messageData
+
+    msg =
+      action: action
+      data: data
+
+    if @get 'connected'
+      @connection.send JSON.stringify msg
+    else
+      @queue.push msg
+
+  find: (store, type, id) ->
+    @sendMessage "GET", type, { id: id }
+    id: id
 
   createRecord: (store, type, record) ->
     data = {}
@@ -57,8 +81,7 @@ WebSocketAdapter = DS.Adapter.extend
 
     serializer.serializeIntoHash(data, type, record, { includeId: true })
 
-    msg = @message "POST", type, data
-    @connection.send JSON.stringify msg
+    @sendMessage "POST", type, data
 
   updateRecord: (store, type, record) ->
     @createRecord(store, type, record) # for now...
@@ -66,8 +89,7 @@ WebSocketAdapter = DS.Adapter.extend
   deleteRecord: (store, type, record) ->
     id = Ember.get(record, "id")
 
-    msg = @message "DELETE", type, { id: id }
-    @connection.send JSON.stringify msg
+    @sendMessage "DELETE", type, { id: id }
 # --- }}}
 
 `export default WebSocketAdapter`
