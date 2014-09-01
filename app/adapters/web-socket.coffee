@@ -23,7 +23,7 @@ WebSocketAdapter = DS.Adapter.extend
     protocol = @protocol()
     return unless protocol
 
-    @connection = new WebSocket @get "host", protocol
+    @connection = new WebSocket @get("host"), protocol
     @connection.onopen = @onOpen
     @connection.onmessage = @onMessage
     @connection.onerror = @onError
@@ -38,10 +38,11 @@ WebSocketAdapter = DS.Adapter.extend
     console.log event
 
   onOpen: ->
-    @set 'connected', true
+    @connected = true
     console.log "WebSocket connection opened"
 
   onClose: (event) ->
+    @connected = false
     if event.manual
       console.log "You manually closed the WebSocket connection"
     else
