@@ -57,6 +57,22 @@ ul.select {
 }
 
 input[type=checkbox] {
-  visibility: hidden;
-  border: 2px solid $dark-gray;
+  display: none;
+}
+
+input[type=checkbox] + label {
+  display: block;
+  background: $input-background;
+  border: 1px solid $dark-gray;
+  border-radius: 5px;
+  padding: 10px;
+  font-weight: 400;
+  color: $dark-gray;
+  text-align: center;
+}
+
+input[type=checkbox]:checked + label {
+  border-color: $splash;
+  background: rgba($splash, 0.1);
+  color: black;
 }
