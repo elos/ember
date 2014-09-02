@@ -69,6 +69,7 @@ input[type=checkbox] + label {
   font-weight: 400;
   color: $dark-gray;
   text-align: center;
+  transition: all 0.2s;
 }
 
 input[type=checkbox]:checked + label {
