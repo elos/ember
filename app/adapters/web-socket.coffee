@@ -82,9 +82,11 @@ WebSocketAdapter = DS.Adapter.extend
     serializer.serializeIntoHash(data, type, record, { includeId: true })
 
     @sendMessage "POST", type, data
+    record
 
   updateRecord: (store, type, record) ->
     @createRecord(store, type, record) # for now...
+    record
 
   deleteRecord: (store, type, record) ->
     id = Ember.get(record, "id")
