@@ -23,6 +23,7 @@ WebSocketAdapter = DS.Adapter.extend
     return unless protocol
 
     @connection = new WebSocket @get("host"), protocol
+    @connection.adapter = @
     @connection.onopen = @onOpen
     @connection.onmessage = @onMessage
     @connection.onerror = @onError
@@ -30,7 +31,7 @@ WebSocketAdapter = DS.Adapter.extend
   ).observes("id", "key").on("init")
 
   onMessage: (event) ->
-    @process JSON.parse event.data
+    @adapter.process JSON.parse event.data
 
   onError: (event) ->
     console.log "There was an error with the WebSocket connection"
