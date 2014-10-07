@@ -50,7 +50,9 @@ WebSocketAdapter = DS.Adapter.extend
       console.log event
 
   process: (envelope)->
-    console.log envelope
+    store = @get('container').lookup "store:main"
+    for kind, data of envelope.data
+      store.push(kind, data)
 
   message: (action, type, messageData={}) ->
     data = {}
