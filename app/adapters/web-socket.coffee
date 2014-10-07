@@ -2,7 +2,6 @@
 `import DS from 'ember-data'`
 `import Ember from 'ember'`
 
-# --- WebSocketAdapter {{{
 WebSocketAdapter = DS.Adapter.extend
   id: null
   key: null
@@ -91,7 +90,6 @@ WebSocketAdapter = DS.Adapter.extend
     id = Ember.get(record, "id")
 
     @sendMessage "DELETE", type, { id: id }
-# --- }}}
 
 `export default WebSocketAdapter`
 
