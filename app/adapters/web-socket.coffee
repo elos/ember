@@ -38,11 +38,11 @@ WebSocketAdapter = DS.Adapter.extend
     console.log event
 
   onOpen: ->
-    @connected = true
+    @adapter.connected = true
     console.log "WebSocket connection opened"
 
   onClose: (event) ->
-    @connected = false
+    @adapter.connected = false
     if event.manual
       console.log "You manually closed the WebSocket connection"
     else
