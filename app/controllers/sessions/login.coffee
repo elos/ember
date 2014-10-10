@@ -1,13 +1,27 @@
 `import Ember from 'ember'`
 
 SessionsLoginController = Ember.ObjectController.extend
+
+  needs: ['application']
+
   credentials: null
+
   actions:
     authenticate: ->
       credentials = @get("credentials").split("-")
       id = credentials[0]
       key = credentials[1]
-      adapter = @get('container').lookup "adapter:application"
-      adapter.setProperties({"id": id, "key": key})
+      @get('controllers.application.adapter').connect(id, key)
 
-`export default SessionsLoginController`
+  authenticated: (()->
+    if @get('controllers.application.adapter.connected')
+      @transitionToRoute('home')
+    else if @get('controllers.application.adapter.failedConnection')
+      @loginFailed()
+  ).observes('controllers.application.adapter.connected',
+             'controllers.application.adapter.failedConnection')
+
+  loginFailed: () ->
+    alert('login failed :(')
+
+ `export default SessionsLoginController`

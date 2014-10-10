@@ -5,10 +5,12 @@
 WebSocketAdapter = DS.Adapter.extend
   id: null
   key: null
+  connection: null
+  connected: false
+  failedConnection: false
 
   store: null
 
-  connected: false
   queue: []
 
   host: "ws://localhost:8000/v1/authenticate"
@@ -18,17 +20,19 @@ WebSocketAdapter = DS.Adapter.extend
     "#{@get("id")}-#{@get("key")}"
   ).observes("id", "key")
 
-  setupConnection: (->
+  connect: (id, key)->
+    @set('failedConnection', false)
+    @setProperties({"id": id, "key": key})
     protocol = @protocol()
     return unless protocol
 
-    @connection = new WebSocket @get("host"), protocol
-    @connection.adapter = @
-    @connection.onopen = @onOpen
-    @connection.onmessage = @onMessage
-    @connection.onerror = @onError
-    @connection.onclose = @onClose
-  ).observes("id", "key").on("init")
+    @set('connection', new WebSocket @get("host"), protocol)
+    connection = @get('connection')
+    connection.adapter = @
+    connection.onopen = @get('onOpen')
+    connection.onmessage = @get('onMessage')
+    connection.onerror = @get('onError')
+    connection.onclose = @get('onClose')
 
   onMessage: (event) ->
     @adapter.process JSON.parse event.data
@@ -36,13 +40,14 @@ WebSocketAdapter = DS.Adapter.extend
   onError: (event) ->
     console.log "There was an error with the WebSocket connection"
     console.log event
+    @adapter.set('failedConnection', true)
 
   onOpen: ->
-    @adapter.connected = true
+    @adapter.set('connected', true)
     console.log "WebSocket connection opened"
 
   onClose: (event) ->
-    @adapter.connected = false
+    @adapter.set('connected', false)
     if event.manual
       console.log "You manually closed the WebSocket connection"
     else
